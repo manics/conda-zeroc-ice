@@ -1,0 +1,65 @@
+# Based on
+# https://github.com/Anaconda-Platform/anaconda-project/blob/544c21993156b2027826d254563b2c60594fd20c/appveyor.yml
+# https://github.com/theochem/python-cython-ci-example/blob/3051bc6ea46ca260c8dbbb4d7671f460bf137235/.appveyor.yml
+
+# Don't run the (redundant) branch build with a pull request
+skip_branch_with_pr: true
+
+matrix:
+  fast_finish: true
+
+environment:
+  PYTHONUNBUFFERED: 1
+  COVERAGE_DIR: ""
+  MINICONDA: C:\\Miniconda3-x64
+  CONDA_UPLOAD_TOKEN:
+    secure: xGzV3ZB6+WCxKP1SNMGu2FnTcZUOj7OR9QR6LJEb+KDPSdON8xbMh97U29rvju2M
+
+install:
+  # conda 4.5.11 seems to expect that this directory exists already
+  - mkdir C:\Users\appveyor\.conda
+  - call %MINICONDA%\Scripts\activate.bat
+  # The safety checks are simply intended to ensure that there is enough disk space
+  # and the user has the necessary permissions to make environment changes. In a CI
+  # environment these are not necessary and slow things down noticeably on Windows.
+  - conda config --set always_yes yes --set changeps1 no --set auto_update_conda no --set safety_checks disabled
+  - conda install -y conda-build anaconda-client
+  - conda info -a
+
+# Not a .NET project, we build in the install step instead
+build: false
+
+test_script:
+  - conda build .
+
+after_test:
+  # Copy the conda build to the home dir, such that it can be registerd as an artifact
+  - move %MINICONDA%\conda-bld .
+
+artifacts:
+  - path: 'conda-bld\win-*\*.tar.bz2'
+
+on_success:
+# Upload to anaconda, with the correct label derived from the version tag.
+# This is virtually impossible with a normal dos batch script...
+# It also contains an incredibly clunky way to avoid build failure when anaconda writes
+# something harmless to stderr. The normal way does not work!
+# & anaconda $parameters 2>&1
+# Powershell should be called Powerhell!
+- ps:
+    if (($Env:APPVEYOR_REPO_TAG -eq "true") -or
+        (($Env:APPVEYOR_PULL_REQUEST_NUMBER -eq "") -and 
+         ($Env:APPVEYOR_REPO_BRANCH -eq "master"))
+        ) {
+      $tar_glob = ".\conda-bld\win-*\${Env:PYPKG}-${Env:APPVEYOR_REPO_TAG_NAME}-*.tar.bz2";
+      Write-Host "tar_glob $tar_glob";
+      if ($Env:APPVEYOR_REPO_TAG -eq "true") {
+        $anaconda_label = "main"
+      } else {
+        $anaconda_label = "nightly"
+      };
+      Write-Host "anaconda_label $anaconda_label";
+      $parameters = '-t', "$Env:CONDA_UPLOAD_TOKEN", 'upload', "$tar_glob", '-l',
+                    "$anaconda_label", '--force', '--no-progress';
+      & cmd /c 'anaconda 2>&1' $parameters;
+    }
