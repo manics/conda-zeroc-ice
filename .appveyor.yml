@@ -12,11 +12,14 @@ platform:
   - x64
 
 environment:
-  PYTHONUNBUFFERED: 1
-  COVERAGE_DIR: ""
+  PYTHONUNBUFFERED: "1"
   MINICONDA: C:\\Miniconda3-x64
   CONDA_UPLOAD_TOKEN:
     secure: xGzV3ZB6+WCxKP1SNMGu2FnTcZUOj7OR9QR6LJEb+KDPSdON8xbMh97U29rvju2M
+  matrix:
+    - PYTHON_VERSION: 3.7
+    - PYTHON_VERSION: 3.6
+    # - PYTHON_VERSION: 2.7
 
 install:
   # conda 4.5.11 seems to expect that this directory exists already
@@ -34,7 +37,7 @@ install:
 build: false
 
 test_script:
-  - conda build .
+  - conda build . --python=%PYTHON_VERSION%
 
 after_test:
   # Copy the conda build to the home dir, such that it can be registerd as an artifact
