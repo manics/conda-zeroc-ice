@@ -32,7 +32,6 @@ requirements:
   run:
     - python
     - openssl
-    - vc 9    # [win and py27]
 
 test:
   imports:
