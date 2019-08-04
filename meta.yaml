@@ -26,22 +26,17 @@ build:
 requirements:
   build:
     - {{ compiler('cxx') }}
+  skip: True  # [win and vc<14]
   host:
     - bzip2
     - expat
     - openssl
     - pip
     - python
-    - vc 9    # [win and py27]
-    # - vc 14   # [win and py35]
-    # - vc 14   # [win and py36]
   run:
     - python
     - openssl
     - vc 9    # [win and py27]
-    # - vc 14   # [win and py35]
-    # - vc 14   # [win and py36]
-    # Other dependencies are automatic
 
 test:
   imports:

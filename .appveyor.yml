@@ -8,6 +8,9 @@ skip_branch_with_pr: true
 matrix:
   fast_finish: true
 
+platform:
+  - x64
+
 environment:
   PYTHONUNBUFFERED: 1
   COVERAGE_DIR: ""
