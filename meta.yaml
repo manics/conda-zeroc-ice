@@ -18,6 +18,10 @@ build:
   entry_points:
     - slice2py=slice2py:main
   script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+  features:
+    - vc9   # [win and py27]
+    # - vc14  # [win and py35]
+    # - vc14  # [win and py36]
 
 requirements:
   build:
@@ -28,9 +32,16 @@ requirements:
     - openssl
     - pip
     - python
+    - vc 9    # [win and py27]
+    # - vc 14   # [win and py35]
+    # - vc 14   # [win and py36]
   run:
     - python
     - openssl
+    - vc 9    # [win and py27]
+    # - vc 14   # [win and py35]
+    # - vc 14   # [win and py36]
+    # Other dependencies are automatic
 
 test:
   imports:
