@@ -10,6 +10,7 @@ env:
   global:
     - PACKAGE_NAME=zeroc-ice
     - PATH="$HOME/miniconda/bin:$PATH"
+    - REQUIREMENTS_CHANNEL=manics
 
 install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
@@ -28,7 +29,7 @@ script:
     else
       export VERSION_SUFFIX="";
     fi
-  - conda build .
+  - conda build -c ${REQUIREMENTS_CHANNEL} .
 
 deploy:
   - provider: script
