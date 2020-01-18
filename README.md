@@ -1,4 +1,4 @@
-# Zeroc Ice Conda meta-package for OMERO
-[![Anaconda-Server Badge](https://anaconda.org/manics/zeroc-ice/badges/version.svg)](https://anaconda.org/manics/zeroc-ice)
+# Zeroc Ice 3.6 Conda package for OMERO
+[![Anaconda-Server Badge](https://anaconda.org/manics/zeroc-ice36/badges/version.svg)](https://anaconda.org/manics/zeroc-ice36)
 
-A meta package for the Zeroc Ice binaries and Python module compatible with OMERO.
+A Conda package for Zeroc Ice 3.6 binaries compatible with OMERO.

@@ -1,35 +1,85 @@
-{% set name = "zeroc-ice" %}
+{% set name = "zeroc-ice36" %}
 {% set version = "3.6.5" %}
 
 package:
   name: "{{ name|lower }}"
   version: "{{ version }}{{ environ.get('VERSION_SUFFIX', '') }}"
 
+source:
+  - url: https://github.com/zeroc-ice/ice/archive/v{{ version }}.tar.gz
+    sha256: 5c308c24c9721dd614d28cf5a5fa9ac19736f7a8ab894f9fd05fe5b9ac0be4fe
+    patches:
+      # Always use lib instead of lib64
+      # Compilation workarounds
+      - omero-zeroc-linux.patch
+  # https://github.com/zeroc-ice/ice/blob/v3.6.5/.travis.yml
+  - url: https://github.com/zeroc-ice/mcpp/archive/v2.7.2.14.tar.gz
+    sha256: 1a426cf2d513ffd66634384d5445dcce1aac83be1789a56044013eab8ca8ffff
+    folder: mcpp
+    patches:
+      # Always use lib instead of lib64
+      - omero-zeroc-mcpp-lib64.patch
+
 build:
-  number: 0
-  noarch: generic
+  number: 1
   script_env:
     - VERSION_SUFFIX
 
+# This is the default zeroc-ice36 metapackage
 requirements:
   run:
-    - zeroc-ice-bin={{ version }}
-    - zeroc-ice-python={{ version }}
+    - {{ pin_subpackage('zeroc-ice36-bin', exact=True) }}
+    - zeroc-ice36-python={{ version }}
 
-test:
-  imports:
-    - Ice
-  commands:
-    - icegridnode --version
+outputs:
+  - name: zeroc-ice36-bin
+    script: build-install.sh
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+      host:
+        - bzip2
+        - expat
+        - libdb53
+        - make
+        - openssl
+        - pip
+      run:
+        - bzip2
+        - expat
+        - libdb53
+        - openssl
+    test:
+      commands:
+        - dumpdb --version
+        - glacier2router --version
+        - icebox --version
+        - iceboxadmin --version
+        - icegridadmin --version
+        - icegriddb --version
+        - icegridnode --version
+        - icegridregistry --version
+        - icepatch2calc --version
+        - icepatch2client --version
+        - icepatch2server --version
+        - icestormadmin --version
+        - icestormdb --version
+        - slice2cpp --version
+        - slice2cs --version
+        - slice2freeze --version
+        - slice2freezej --version
+        - slice2html --version
+        - slice2java --version
+        - slice2js --version
+        - slice2php --version
+        - transformdb --version
 
 about:
   home: https://zeroc.com
   license: GNU General Public v2 (GPLv2)
   license_family: GPL2
-  summary: Meta package for the Zeroc Ice binaries and Python module.
-  description: |
-    Ice is a comprehensive RPC framework with support for Python, C++, .NET, Java, JavaScript and more.
-    This meta-package includes the Zeroc Ice binaries and Python module.
+  summary: Ice is a comprehensive RPC framework with support for Python, C++, .NET, Java, JavaScript and more.
 
 extra:
   recipe-maintainers:

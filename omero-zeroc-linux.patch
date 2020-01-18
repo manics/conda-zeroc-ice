@@ -1,0 +1,57 @@
+diff --git a/config/Make.common.rules b/config/Make.common.rules
+index 64fae279bf..c6dabb60c6 100644
+--- a/config/Make.common.rules
++++ b/config/Make.common.rules
+@@ -91,12 +91,6 @@ endif
+ ifeq ($(UNAME),Linux)
+    ifeq ($(MACHINE_TYPE),x86_64)
+       HOST_ARCH		= amd64
+-      #
+-      # Rhel/SLES
+-      #
+-      ifeq ($(shell test -d $(usr_dir)/lib64 && echo 0),0)
+-          lp64suffix	= 64
+-      endif
+ 
+       ifeq ($(LP64),)
+           LP64      	= yes
+@@ -140,16 +134,6 @@ ifneq ($(findstring MINGW,$(UNAME)),)
+     endif
+ endif
+ 
+-#
+-# Debian
+-#
+-ifneq ($(wildcard /etc/debian_version),)
+-    HOST_ARCH          	= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+-    DEB_HOST_MULTIARCH 	?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+-    lp64suffix		?= /$(DEB_HOST_MULTIARCH)
+-    lp32suffix		?= /$(DEB_HOST_MULTIARCH)
+-endif
+-
+ 
+ 
+ ifeq ($(LP64),yes)
+diff --git a/cpp/config/Make.rules.Linux b/cpp/config/Make.rules.Linux
+index 10120d8bc7..66e248fc91 100644
+--- a/cpp/config/Make.rules.Linux
++++ b/cpp/config/Make.rules.Linux
+@@ -92,7 +92,7 @@ ifeq ($(GCC_COMPILER),yes)
+         endif
+     endif
+ 
+-    CXXFLAGS		+= $(CXXARCHFLAGS) -fvisibility=hidden -Wall -Werror -pthread
++    CXXFLAGS		+= $(CXXARCHFLAGS) -fvisibility=hidden -Wall -pthread
+ 
+     # If MAXWARN is set then enable extra warnings
+     ifeq ($(MAXWARN),yes)
+@@ -221,7 +221,8 @@ ICESSL_LIBS     = $(OPENSSL_RPATH_LINK) -lIceSSL
+ LIBS		= $(BZIP2_RPATH_LINK) -lIce $(BASELIBS)
+ 
+ CRYPT_OS_LIBS   = -lcrypt
+-ICEUTIL_OS_LIBS = -lrt $(OPENSSL_RPATH_LINK) -lcrypto
++ICEUTIL_OS_LIBS = -lrt $(OPENSSL_RPATH_LINK) $(OPENSSL_LIBS)
+ ICE_OS_LIBS     = -ldl
++BASELIBS	+= $(ICEUTIL_OS_LIBS)
+ 
+ PLATFORM_HAS_READLINE   = yes
